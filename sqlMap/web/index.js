@@ -1,6 +1,7 @@
 /**
  *@author JC
  *@license：web sql
+ *@date 2022-07-15
  **/
 const webSQL = {
     webSite:{
