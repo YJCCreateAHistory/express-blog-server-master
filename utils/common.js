@@ -42,3 +42,5 @@ const comMethods = {
 
 
 module.exports = comMethods
+
+// conso
