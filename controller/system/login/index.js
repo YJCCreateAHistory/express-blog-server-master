@@ -8,20 +8,20 @@ const _sql = require("../../../sqlMap/system/index")
 const {
     setToken
 } = require("../../../utils/token")
-let {aes} = require("../../../utils/crypto")
+let {
+    aes
+} = require("../../../utils/crypto")
 exports.login = async (req, res, next) => {
     try {
-        let params = req.body
-        // let pwd = aes.de(params.userPassword) // 加密
+        let params = req.query
         // 查询语句
-        let sql = _sql.sysAdminUser.list + ` where username='${params.loginAccount}' and password='${params.userPassword}'`
+        let sql = _sql.sysAdminUser.list + ` where username='${params.username}' and password='${params.password}'`
         // 发起请求
         reqSqlPool.commonQuery(sql, params).then(data => {
             let resData = data || {}
-            // console.log(resData)
-            if (resData.records) {
+            if (resData.records || resData.records.length) {
                 // 生成token
-                setToken(params.loginAccount, params.userPassword).then(_token => {
+                setToken(params.username, params.password).then(_token => {
                     let _data = {
                         data: {
                             adminInfo: {
@@ -32,13 +32,15 @@ exports.login = async (req, res, next) => {
                                 "userNickName": "超级管理员",
                                 "userId": "1",
                                 "orgId": "O1-1"
+
                             },
-                            token: _token
+                            statusCode: 200,
+                            Msg: "登录成功",
+                            error: "0",
                         },
-                        Msg: "登录成功",
-                        error: "0"
                     }
-                    res.status(200).json(_data)
+                    resData.token = _token
+                    res.status(200).json(resData)
                 })
             } else {
 
@@ -57,3 +59,4 @@ exports.login = async (req, res, next) => {
         next(err)
     }
 }
+

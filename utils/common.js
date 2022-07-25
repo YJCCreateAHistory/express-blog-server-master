@@ -6,7 +6,7 @@
 let conn = require('../common') // 引入公共连接池
 
 const comMethods = {
-    commonQuery: (sql, params = []) => {
+    commonQuery: (sql, params=[]) => {
         return new Promise((resolve, reject) => {
             conn.query(sql, params, (err, result) => {
                 result ? resolve({
@@ -14,11 +14,12 @@ const comMethods = {
                     current: params.current || 1,
                     records: result,
                     size: params.size || 20,
-                    Msg: '操作成功！'
+                    Msg: '操作成功！',
                 }) : console.log("错误", err)
                 reject({
                     error: 1,
-                    errMsg: '操作错误！'
+                    errMsg: '操作错误！',
+                    status:'404'
                 })
             })
         })

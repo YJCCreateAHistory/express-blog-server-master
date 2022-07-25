@@ -19,7 +19,7 @@ app.all('*', function(req, res, next) {
 });
 
 // 表单请求
-app.use(bodyParser.urlencoded({ extended: true , 'type':'text/plain' }));
+app.use(bodyParser.urlencoded({extended:true}));
 // 数据库；连接测试
 // app.get('/', (req, res)=>{
     
