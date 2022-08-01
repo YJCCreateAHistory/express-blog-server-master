@@ -1,9 +1,6 @@
 const reqSqlPool = require("../../../utils/common")
 const _sql = require("../../../sqlMap/system/index")
 const tools = require("../../../utils/tool")
-const {
-    query
-} = require("express")
 /**
  * @date 2022-07-23
  * @Business 博文列表
@@ -11,13 +8,13 @@ const {
  **/
 exports.getBlogList = async (req, res, next) => {
     try {
-        let sql = '', queryTotal = ', total = 0'
+        let sql = '', queryTotal = '', total = 0
         let params = req.body
         if (params.id) {
-            sql = _sql.articleOptions.list + ` WHERE id='${params.id}' ORDER BY ${params.orderBy} ${params.orderType} LIMIT ${params.size} OFFSET ${params.size * (params.current - 1)}`
+            sql = _sql.articleOptions.list + ` WHERE id='${params.id}'`
             queryTotal = _sql.articleOptions.count + ` WHERE id='${params.id}'` 
         } else if (params.className) {
-            sql = _sql.articleOptions.list + ` WHERE className='${params.className}' ORDER BY ${params.orderBy} ${params.orderType} LIMIT ${params.size} OFFSET ${params.size * (params.current - 1)}`
+            sql = _sql.articleOptions.list + ` WHERE className='${params.className}' `
             queryTotal = _sql.articleOptions.count + ` WHERE className='${params.className}'` 
         } else if (params.title) {
             sql = _sql.articleOptions.list + ` WHERE title='${params.title}' ORDER BY ${params.orderBy} ${params.orderType} LIMIT ${params.size} OFFSET ${params.size * (params.current - 1)}`
@@ -28,14 +25,18 @@ exports.getBlogList = async (req, res, next) => {
             queryTotal = _sql.articleOptions.count + ` WHERE classId='${params.classId}'` 
         } else if (params.id && params.className && params.classId) {
             sql = _sql.articleOptions.list + ` WHERE id='${params.id}' AND className='${params.className}' AND classId='${params.classId}' ORDER BY ${params.orderBy} ${params.orderType} LIMIT ${params.size} OFFSET ${params.size * (params.current - 1)}`
-            queryTotal = _sql.articleOptions.count + ` WHERE classId='${params.classId}' AND title='${params.title}' AND className='${params.className}' AND id='${params.id}'` 
-        
+            queryTotal = _sql.articleOptions.count + ` WHERE classId='${params.classId}' AND title='${params.title}' AND className='${params.className}' AND id='${params.id}'`      
         } else {
-            sql = _sql.articleOptions.list ` ORDER BY ${params.orderBy} ${params.orderType} LIMIT ${params.size} OFFSET ${params.size * (params.current - 1)}`
+            sql = _sql.articleOptions.list
             queryTotal = _sql.articleOptions.count
         }
+        reqSqlPool.queryCount(queryTotal).then(data=>{
+            total = data
+        })
         reqSqlPool.commonQuery(sql, params).then(data => {
+            // console.log(data)
             let resData = data || {}
+            resData.total = total
             res.json(resData)
         }).catch(err => {
             console.log("--查询博文失败--", err)
@@ -45,6 +46,7 @@ exports.getBlogList = async (req, res, next) => {
     }
 }
 
+
 /**
  * @author JC
  * @date 2022-07-23
@@ -53,6 +55,7 @@ exports.getBlogList = async (req, res, next) => {
 exports.createBlog = async (req, res, next) => {
     try {
         let params = req.body
+        console.log(params)
         let sql = _sql.articleOptions.create
         let classSql = _sql.articleOptions.list + ` WHERE classId='${params.classId}'`
         // 拿到分类数据
@@ -61,29 +64,28 @@ exports.createBlog = async (req, res, next) => {
             if (resClass.error) {
                 resClass.json(resClass)
             } else {
-                // 博文信息
+                // 博文信
                 let blogParams = [
                     tools.createRandomId(),
-                    resClass.records[0].id,
-                    resClass.records[0].className,
-                    resClass.records[0].classValue,
-                    params.title, 0,
+                    tools.createRandomId(),
+                    params.className,
+                    params.classValue,
+                    params.title,
+                    params.isPublish,
                     params.summary,
                     0, 0,
                     params.img,
                     params.content,
                     params.isTop,
                     params.isHot,
-                    '',
+                    params.pubTime,
                     tools.getDate(),
                     ' ',
-                    params.catetypeId
-                ]
+                ] 
                 reqSqlPool.commonQuery(sql, blogParams).then(data => {
                     let resData = data || {}
-                    // console.log(resData)
                     res.json(resData)
-                })
+                })              
             }
         }).catch(err => {
             console.log("--新增文章失败--", err)
@@ -92,7 +94,6 @@ exports.createBlog = async (req, res, next) => {
         next(err)
     }
 }
-
 /**
  * @date 2022-07-23
  * @Business 修改博文
@@ -110,11 +111,11 @@ exports.updateBlog = async (req, res, next) => {
             } else {
                 // 修改博文信息
                 let blogParams = [
-                    resClass.records[0].id,
-                    resClass.records[0].className,
-                    resClass.records[0].classValue,
-                    params.title,
+                    params.classId,
+                    params.className,
+                    params.classValue,
                     params.isPublish,
+                    params.title,
                     params.summary,
                     params.commentsCount,
                     params.viewsCount,
@@ -125,9 +126,9 @@ exports.updateBlog = async (req, res, next) => {
                     params.pubTime,
                     params.insertTime,
                     tools.getDate(),
-                    params.catetypeId,
                     params.id
                 ]
+
                 reqSqlPool.commonQuery(sql, blogParams).then(data => {
                     let resData = data || {}
                     res.json(resData)
@@ -140,6 +141,7 @@ exports.updateBlog = async (req, res, next) => {
         next(err)
     }
 }
+
 
 /**
  * @date 2022-07-25
@@ -173,16 +175,16 @@ exports.getBlogArticleClasses = async (req, res, next) => {
             total = 0
         // 多条件查询
         if (params.id && params.className) {
-            sql = _sql.articleClassOpt.list + ` WHERE id='${params.id}' AND className='${params.className}' ORDER BY ${params.orderBy} ${params.orderType} LIMIT ${params.size} OFFSET ${params.size * (params.current - 1)}`
+            sql = _sql.articleClassOpt.list + ` WHERE id='${params.id}' AND className='${params.className}' `
             queryTotal = _sql.articleClassOpt.list + ` WHERE id='${params.id}' AND className='${params.className}'`
         } else if (params.id) {
-            sql = _sql.articleClassOpt.list + ` WHERE id='${params.id}'  ORDER BY ${params.orderBy} ${params.orderType} LIMIT ${params.size} OFFSET ${params.size * (params.current - 1)}`
+            sql = _sql.articleClassOpt.list + ` WHERE id='${params.id}' `
             queryTotal = _sql.articleClassOpt.count + ` WHERE id='${params.id}'`
         } else if (params.className) {
-            sql = _sql.articleClassOpt.list + ` WHERE className='${params.className}'  ORDER BY ${params.orderBy} ${params.orderType} LIMIT ${params.size} OFFSET ${params.size * (params.current - 1)}`
+            sql = _sql.articleClassOpt.list + ` WHERE className='${params.className}'`
             queryTotal = _sql.articleClassOpt.count + ` WHERE className='${params.className}'`
         } else {
-            sql = _sql.articleClassOpt.list ` ORDER BY ${params.orderBy} ${params.orderType} LIMIT ${params.size} OFFSET ${params.size * (params.current - 1)}`
+            sql = _sql.articleClassOpt.list
             queryTotal = _sql.articleClassOpt.count
         }
         reqSqlPool.queryCount(queryTotal).then(data => {
@@ -190,6 +192,7 @@ exports.getBlogArticleClasses = async (req, res, next) => {
         })
         reqSqlPool.commonQuery(sql, params).then(data => {
             let resData = data || {}
+            resData.total = total
             res.json(resData)
         })
     } catch (err) {
@@ -204,11 +207,12 @@ exports.getBlogArticleClasses = async (req, res, next) => {
 exports.createBlogArticleClasses = async (req, res, next) => {
     try {
         let params = req.body
+        console.log(params) 
         // 创建语句
         let sql = _sql.articleClassOpt.create
         // 查重语句
-        let checkExisted = _sql.articleClassOpt.list + ` WHERE  classValue= '${params.classValue}' OR className=${params.className}'`
-        reqSqlPool.commonQuery(checkExisted, params).then(data => {
+        let checkExisted = _sql.articleClassOpt.list + ` WHERE className='${params.className}'`
+        reqSqlPool.commonQuery(checkExisted).then(data => {
             let resData = data || {}
             // 先查找是否存在类名
             if (resData.records.length > 0) {
@@ -232,6 +236,7 @@ exports.createBlogArticleClasses = async (req, res, next) => {
                 })
             }
         })
+
     } catch (err) {
         next(err)
     }
@@ -247,16 +252,18 @@ exports.updateBlogArticleClasses = async (req, res, next) => {
         let params = req.body
         // 修改语句
         let sql = _sql.articleClassOpt.update
+        console.log(params)
         let updateParams = [
-            params.id,
             params.className,
             params.classValue,
             params.path,
             params.query,
             params.insertTime,
-            tools.getDate()
+            tools.getDate(),
+            params.id,
         ]
         reqSqlPool.commonQuery(sql, updateParams).then(data => {
+            console.log(data);
             let resData = data || {}
             res.json(resData)
         })
