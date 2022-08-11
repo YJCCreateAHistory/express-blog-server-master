@@ -82,7 +82,7 @@ const sysSqlMap = {
     articleOptions: {
         list: "SELECT * FROM article ",
 
-        count: "SELECT COUNT(id) FROM article;",
+        count: "SELECT COUNT(id) FROM article",
 
         create: "INSERT INTO article (id,classId,className,classValue,title,isPublish,summary,commentsCount,viewsCount,img,content,isTop,isHot,pubTime,insertTime,updateTime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 
@@ -93,10 +93,11 @@ const sysSqlMap = {
         publish: "UPDATE article SET isPublish=?,pubTime=? WHERE id=?",
     },
     //博文分类管理
+    
     articleClassOpt: {
         list: "SELECT * FROM article_class ",
 
-        count: "SELECT COUNT(id) FROM article_class;",
+        count: "SELECT COUNT(id) FROM article_class",
 
         create: "INSERT INTO article_class (id,className,classValue,path,query,insertTime,updateTime) VALUES (?,?,?,?,?,?,?)",
 
@@ -118,5 +119,13 @@ const sysSqlMap = {
         subCommentCount: "UPDATE article SET commentsCount=? WHERE id=?",
 
     },
+    // 照片墙管理
+    imgPictureWall:{
+        list: "SELECT * FROM web_img_wall",
+        count: "SELECT COUNT(id) FROM web_img_wall",
+        delete: "DELETE FROM web_img_wall WHERE id=?",
+        update: "UPDATE web_img_wall SET img=? WHERE id=?",
+        create: "INSERT INTO web_img_wall (id, img, insertTime) VALUES(?, ?, ?)"
+    }
 }
 module.exports =  sysSqlMap

@@ -18,6 +18,7 @@ exports.login = async (req, res, next) => {
         let sql = _sql.sysAdminUser.list + ` where username='${params.username}' and password='${params.password}'`
         // 发起请求
         reqSqlPool.commonQuery(sql, params).then(data => {
+            console.log(data);
             let resData = data || {}
             if (resData.records || resData.records.length) {
                 // 生成token

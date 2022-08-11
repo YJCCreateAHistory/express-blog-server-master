@@ -11,7 +11,6 @@ exports.getWebSiteInfo = async (req, res, next)=>{
     try{
         let sql = _sql.webSiteInfoOptions.list
         reqSqlPool.commonQuery(sql).then(data=>{
-            console.log(data);
             let resData = data || {}
             res.json(resData);
         }) 

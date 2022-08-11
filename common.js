@@ -1,7 +1,7 @@
 const mysql = require('mysql')
 // 创建连接池
 let connections = mysql.createConnection({
-    host: 'localhost',
+    host: '127.0.0.1',
     port: 3306,
     user: "root",
     password: "root",

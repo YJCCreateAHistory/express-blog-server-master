@@ -38,4 +38,4 @@ app.use(err_handler())
 // 监听端口
 app.listen(5000) // 监听server5220端口
 
-console.log('success listen at port:5000')
+console.log('success listen at port:5220')

@@ -10,6 +10,7 @@ exports.getBlogList = async (req, res, next) => {
     try {
         let sql = '', queryTotal = '', total = 0
         let params = req.body
+        console.log(params)
         if (params.id) {
             sql = _sql.articleOptions.list + ` WHERE id='${params.id}'`
             queryTotal = _sql.articleOptions.count + ` WHERE id='${params.id}'` 
@@ -282,6 +283,7 @@ exports.updateBlogArticleClasses = async (req, res, next) => {
         let params = req.body
         // 修改语句
         let sql = _sql.articleClassOpt.delete
+        console.log(params)
         let deleteParams = [
             params.id
         ]

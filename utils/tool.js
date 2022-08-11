@@ -21,20 +21,17 @@ const tools = {
     //生成永不重复的id
     createRandomId: () => {
         return md5(
-            (Math.random() * 10000000).toString(16).substr(0, 4)
+            (Math.random() * 10000000).toString(16).substring(0, 5)
             + '-' +
             (new Date()).getTime()
             + '-' +
-            Math.random().toString().substr(2, 5)
+            Math.random().toString().substring(2, 6)
         ).toString()
     },
     //获取实时时间
     getDate:()=>{
        return new Date().Format("yyyy-MM-dd hh:mm:ss")
     },
-
-
-
 }
 
 module.exports = tools

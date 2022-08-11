@@ -7,7 +7,7 @@ const userRoleController = require('../../controller/system/admin_user/index')
 const webSiteInfoController = require('../../controller/system/web_site/index')
 const aboutController = require('../../controller/system/about_blog/index')
 const webSocialsController = require('../../controller/system/web_socials/index')
-
+const imgController = require('../../controller/system/WEB_IMG_ALL/index')
 /**
  * @Business 登录
  * @date 2022-07-22
@@ -19,11 +19,11 @@ router.post("/xc-blog/admin/login", webLoginController.login)
  * @Business 系统用户管理
  * @date 2022-07-23
  * **/
+
 router.post("/xc-blog/admin/role", adminRoleController.adminRoleList)
 router.post("/xc-blog/admin/create", adminRoleController.createAdminRole)
 router.post("/xc-blog/admin/delete", adminRoleController.deleteAdminRole)
 router.post("/xc-blog/admin/update", adminRoleController.updateAdminRole)
-
 
 /**
  * @Business 博客管理
@@ -45,6 +45,7 @@ router.post("/xc-blog/admin/user/list", userRoleController.getAdminUser)
 router.post("/xc-blog/admin/user/create",userRoleController.createAdminUser)
 router.post("/xc-blog/admin/user/delete",userRoleController.deleteAdminUser)
 router.post("/xc-blog/admin/user/update",userRoleController.updateAdminUser)
+
 
 
 /**
@@ -76,5 +77,13 @@ router.post("/xc-blog/admin/socials/create", webSocialsController.createWebSocia
 router.post("/xc-blog/admin/socials/update", webSocialsController.updateWebSocialsInfo)
 router.post("/xc-blog/admin/socials/delete", webSocialsController.deleteWebSocialsInfo)
 
+/**
+ * @Business 照片
+ * @date 2022-07-29
+ * **/
+router.get("/xc-blog/admin/img/list", imgController.getImgList)
+router.post("/xc-blog/admin/img/create", imgController.createImgList)
+router.post("/xc-blog/admin/img/update", imgController.updateImgList)
+router.post("/xc-blog/admin/img/delete", imgController.deleteImgList)
 
 module.exports = router
